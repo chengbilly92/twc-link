@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>姬路城 Online</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f7f1e3; --fg: #2b2622; --muted: #6e655b; --accent: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1c1a18; --fg: #eee7da; --muted: #a59d91; --accent: #e06a5f; } }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
+         font: 16px/1.6 system-ui, -apple-system, "PingFang TC", "Noto Sans TC", sans-serif; }
+  main { padding: 24px 16px; text-align: center; }
+  h1 { font-size: 22px; margin: 0 0 8px; color: var(--accent); }
+  p { margin: 0; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>姬路城 Online</h1>
+  <p id="msg">正在前往遊戲網站…</p>
+</main>
+<script>
+// Fixed entry point published by twc-service.sh (scripts/publish-url.mjs): forwards to the current tunnel URL from
+// url.json and keeps "#/game/<id>?token=…" as the path there. The part after "#" is never sent to GitHub, so seat
+// tokens stay between the browser and the game server. This page is public: it holds no art and no secrets.
+const rest = location.hash.startsWith('#/') ? location.hash.slice(1) : '/';
+fetch('url.json?t=' + Date.now(), { cache: 'no-store' })
+  .then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))))
+  .then(({ url }) => {
+    if (!/^https:\/\/[^/]+$/.test(url)) throw new Error('bad url');
+    location.replace(url + rest);
+  })
+  .catch(() => {
+    document.getElementById('msg').textContent = '暫時找不到遊戲網址，請過一分鐘再重新整理。';
+  });
+</script>
+</body>
+</html>
